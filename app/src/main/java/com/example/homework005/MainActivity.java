@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-//import android.widget.CheckBox;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -32,22 +32,23 @@ import com.example.homework005.util.ViewUtil;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
 
     private RadioGroup rg_login; // 声明一个单选组对象
-    private RadioButton rb_password; // 声明一个单选按钮对象`
+    private RadioButton rb_password; // 声明一个单选按钮对象
     private RadioButton rb_verifycode; // 声明一个单选按钮对象
     private EditText et_phone; // 声明一个编辑框对象
     private TextView tv_password; // 声明一个文本视图对象
     private EditText et_password; // 声明一个编辑框对象
     private Button btn_forget; // 声明一个忘记密码按钮控件对象
     private Button btn_login; // 声明一个登录按钮控件对象
-    //private CheckBox ck_remember; // 声明一个复选框对象
-    private Switch switch1;
-    private TextView textView;
+    private CheckBox ck_remember; // 声明一个复选框对象
 
     private int mRequestCode = 0; // 跳转页面时的请求代码
-    private int mType = 0; // 用户类型
+    private int mType = 2; // 用户类型
     private boolean bRemember = false; // 是否记住密码
     private String mPassword = "111111"; // 默认密码
     private String mVerifyCode; // 验证码
+    private Switch sw_status;
+    private TextView textView;
+    private Button btn_register;
 
     private SharedPreferences mShared; // 声明一个共享参数对象
 
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        btn_register = findViewById(R.id.btn_register);
         rg_login = findViewById(R.id.rg_login);
         rb_password = findViewById(R.id.rb_password);
         rb_verifycode = findViewById(R.id.rb_verifycode);
@@ -66,13 +69,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         et_password = findViewById(R.id.et_password);
         btn_forget = findViewById(R.id.btn_forget);
         btn_login = findViewById(R.id.btn_login);
+        sw_status = findViewById(R.id.switch1);
+        textView= findViewById(R.id.textView);
+
         //ck_remember = findViewById(R.id.ck_remember);
-        switch1 = findViewById(R.id.switch1);
-        textView = findViewById(R.id.textView);
+
         // 给rg_login设置单选监听器
         rg_login.setOnCheckedChangeListener(new RadioListener());
         // 给ck_remember设置勾选监听器
-        switch1.setOnCheckedChangeListener(new CheckListener());
+        sw_status.setOnCheckedChangeListener(new CheckListener());
         // 给et_phone添加文本变更监听器
         et_phone.addTextChangedListener(new HideTextWatcher(et_phone));
         // 给et_password添加文本变更监听器
@@ -80,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btn_forget.setOnClickListener(this);
         btn_login.setOnClickListener(this);
+        btn_register.setOnClickListener(this);
 
         initTypeSpinner();
 
@@ -114,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 设置下拉框的数组适配器
         sp_type.setAdapter(typeAdapter);
         // 设置下拉框默认显示第几项
-        sp_type.setSelection(2);
+        sp_type.setSelection(mType);
 
         // 给下拉框设置选择监听器，一旦用户选中某一项，就触发监听器的onItemSelected方法
         sp_type.setOnItemSelectedListener(new TypeSelectedListener());
@@ -140,15 +146,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tv_password.setText("登录密码：");
                 et_password.setHint("请输入密码");
                 btn_forget.setText("忘记密码");
-                switch1.setVisibility(View.VISIBLE);
-
+                sw_status.setVisibility(View.VISIBLE);
                 textView.setVisibility(View.VISIBLE);
             } else if (checkedId == R.id.rb_verifycode) { // 选择了验证码登录
                 tv_password.setText("　验证码：");
                 et_password.setHint("请输入验证码");
                 btn_forget.setText("获取验证码");
-                switch1.setVisibility(View.INVISIBLE);
+                sw_status.setVisibility(View.INVISIBLE);
                 textView.setVisibility(View.INVISIBLE);
+
             }
         }
     }
@@ -198,6 +204,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == R.id.btn_register) {
+            Intent intent = new Intent(this, RegisterActivity.class);
+            // 携带手机号码跳转到找回密码页面
+            startActivity(intent);
+
+
+        }
         String phone = et_phone.getText().toString();
         if (v.getId() == R.id.btn_forget) { // 点击了“忘记密码”按钮
             if (phone.length() < 11) { // 手机号码不足11位
